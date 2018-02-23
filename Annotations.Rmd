@@ -1,0 +1,237 @@
+---
+title: "Annotations"
+output: html_document
+---
+
+<style>
+    body .main-container {
+       max-width: 1500px;
+    }
+</style>
+
+
+```{r setup, echo=FALSE}
+options(width = 1000)
+```
+
+## Bioconductor Resources
+
+https://www.bioconductor.org/help/workflows/annotation-data/
+
+https://bioconductor.org/help/workflows/annotation/Annotation_Resources/
+
+## Libraries
+
+```{r, message=FALSE}
+library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
+library(org.Dm.eg.db)
+library(BSgenome.Dmelanogaster.UCSC.dm6)
+library(GO.db)
+library(rtracklayer)
+```
+
+## TxDb
+
+```{r, message=FALSE}
+# TxDb object
+
+txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+```
+
+```{r, message=FALSE, echo=FALSE}
+txdb
+```
+
+
+```{r, message=FALSE}
+# extract ranges
+
+fly_genes <- genes(txdb)
+
+fly_exons <- exonsBy(txdb, by = "gene")
+
+fly_fiveUTR <- fiveUTRsByTranscript(txdb)
+```
+
+
+```{r, message=FALSE, echo=FALSE}
+fly_genes
+fly_exons
+fly_fiveUTR
+```
+
+
+## OrgDb
+
+
+```{r, message=FALSE}
+# OrgDb object
+
+orgdb <- org.Dm.eg.db
+```
+
+```{r, message=FALSE, echo=FALSE}
+orgdb
+```
+
+```{r, message=FALSE}
+# columns
+
+columns(orgdb)
+```
+
+```{r, message=FALSE}
+# mapping gene ids
+
+favorite_gene <- "roX2"
+
+mapIds(orgdb, 
+       keys = favorite_gene, 
+       keytype = "SYMBOL", 
+       column = "FLYBASE", 
+       multiVals = "first")
+```
+
+```{r, message=FALSE}
+# update gene ranges
+
+fly_genes$symbol <-  mapIds(orgdb, 
+                            keys = fly_genes$gene_id, 
+                            keytype = "FLYBASE", 
+                            column = "SYMBOL", 
+                            multiVals = "first")
+```
+
+
+```{r, message=FALSE, echo=FALSE}
+fly_genes
+```
+
+```{r, message=FALSE}
+# GO
+
+favorite_gene_GO <- mapIds(orgdb, 
+                           keys = favorite_gene, 
+                           keytype = "SYMBOL", 
+                           column = "GO", 
+                           multiVals = "list")
+
+```
+
+```{r, message=FALSE, echo=FALSE}
+favorite_gene_GO
+```
+
+## GODb
+
+
+```{r, message=FALSE}
+# GODb object
+
+GO.db
+```
+
+```{r, message=FALSE}
+# convert ids
+
+select(GO.db, favorite_gene_GO[[1]], "TERM", "GOID")
+
+```
+
+## BSgenome
+
+
+```{r, message=FALSE}
+# genome objects
+
+fly_genome <- BSgenome.Dmelanogaster.UCSC.dm6
+
+```
+
+
+```{r, message=FALSE, echo=FALSE}
+to_print <- head(data.frame(capture.output(fly_genome)), 8)
+
+colnames(to_print) <- NULL
+
+print(to_print, right = F, row.names=F)
+
+```
+
+
+```{r, message=FALSE}
+# seqinfo
+
+seqinfo(fly_genome)
+
+```
+
+
+```{r, message=FALSE}
+# extract sequemce
+
+favorite_gene_ranges <- fly_genes[grep(favorite_gene, fly_genes$symbol)]
+
+getSeq(fly_genome, favorite_gene_ranges)
+
+```
+
+
+## External Annotations
+
+
+```{r, message=FALSE, warning=FALSE}
+# TxDb from GTF
+
+txdb <- makeTxDbFromGFF("dmel-all-r6.17.gtf", format = "gtf")
+
+```
+
+```{r, message=FALSE, echo=FALSE}
+txdb
+```
+
+```{r, message=FALSE}
+# extract genes
+
+genes(txdb)
+```
+
+```{r, message=FALSE}
+# GRanges from GTF
+
+fly_gtf <- import.gff("dmel-all-r6.17.gtf")
+```
+
+
+```{r, message=FALSE, echo=FALSE}
+fly_gtf
+```
+
+
+```{r, message=FALSE}
+# extract by type
+
+fly_genes <- fly_gtf[fly_gtf$type == "gene"]
+
+fly_cds <- fly_gtf[fly_gtf$type == "CDS"]
+
+```
+
+```{r, message=FALSE, echo=FALSE}
+fly_genes 
+fly_cds 
+```
+
+
+```{r, message=FALSE}
+# extract by gene symbol
+
+fly_rRNA <- fly_gtf[grep("rRNA", fly_gtf$gene_symbol)]
+
+```
+
+```{r, message=FALSE, echo=FALSE}
+fly_rRNA 
+```
+
