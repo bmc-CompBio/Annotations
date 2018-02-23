@@ -1,18 +1,3 @@
----
-title: "Annotations"
-output: 
-    html_document:
-        keep_md: true
----
-
-<style>
-    body .main-container {
-       max-width: 1500px;
-    }
-</style>
-
-
-
 
 ## Bioconductor Resources
 
@@ -100,13 +85,13 @@ fly_fiveUTR <- fiveUTRsByTranscript(txdb)
 
 ```
 ## GRangesList object of length 17522:
-## $FBgn0000003 
+## $FBgn0000003
 ## GRanges object with 1 range and 2 metadata columns:
 ##       seqnames             ranges strand |   exon_id   exon_name
 ##          <Rle>          <IRanges>  <Rle> | <integer> <character>
 ##   [1]    chr3R [6822498, 6822796]      + |     49264        <NA>
-## 
-## $FBgn0000008 
+##
+## $FBgn0000008
 ## GRanges object with 13 ranges and 2 metadata columns:
 ##        seqnames               ranges strand | exon_id exon_name
 ##    [1]    chr2R [22136968, 22137026]      + |   22500      <NA>
@@ -120,7 +105,7 @@ fly_fiveUTR <- fiveUTRsByTranscript(txdb)
 ##   [11]    chr2R [22172082, 22172252]      + |   22514      <NA>
 ##   [12]    chr2R [22172316, 22172433]      + |   22515      <NA>
 ##   [13]    chr2R [22172497, 22172834]      + |   22516      <NA>
-## 
+##
 ## ...
 ## <17520 more elements>
 ## -------
@@ -129,22 +114,22 @@ fly_fiveUTR <- fiveUTRsByTranscript(txdb)
 
 ```
 ## GRangesList object of length 29726:
-## $1 
+## $1
 ## GRanges object with 1 range and 3 metadata columns:
 ##       seqnames       ranges strand |   exon_id   exon_name exon_rank
 ##          <Rle>    <IRanges>  <Rle> | <integer> <character> <integer>
 ##   [1]    chr2L [7529, 7679]      + |         1        <NA>         1
-## 
-## $2 
+##
+## $2
 ## GRanges object with 1 range and 3 metadata columns:
 ##       seqnames       ranges strand | exon_id exon_name exon_rank
 ##   [1]    chr2L [7529, 7679]      + |       1      <NA>         1
-## 
-## $3 
+##
+## $3
 ## GRanges object with 1 range and 3 metadata columns:
 ##       seqnames       ranges strand | exon_id exon_name exon_rank
 ##   [1]    chr2L [7529, 7679]      + |       1      <NA>         1
-## 
+##
 ## ...
 ## <29723 more elements>
 ## -------
@@ -186,7 +171,7 @@ orgdb <- org.Dm.eg.db
 ## | KEGGSOURCEURL: ftp://ftp.genome.jp/pub/kegg/genomes
 ## | KEGGSOURCEDATE: 2011-Mar15
 ## | GPSOURCENAME: UCSC Genome Bioinformatics (Drosophila melanogaster)
-## | GPSOURCEURL: 
+## | GPSOURCEURL:
 ## | GPSOURCEDATE: 2014-Dec12
 ## | FBSOURCEDATE: 2017-Feb01
 ## | FBSOURCENAME: Flybase
@@ -213,15 +198,15 @@ columns(orgdb)
 
 favorite_gene <- "roX2"
 
-mapIds(orgdb, 
-       keys = favorite_gene, 
-       keytype = "SYMBOL", 
-       column = "FLYBASE", 
+mapIds(orgdb,
+       keys = favorite_gene,
+       keytype = "SYMBOL",
+       column = "FLYBASE",
        multiVals = "first")
 ```
 
 ```
-##          roX2 
+##          roX2
 ## "FBgn0019660"
 ```
 
@@ -229,10 +214,10 @@ mapIds(orgdb,
 ```r
 # update gene ranges
 
-fly_genes$symbol <-  mapIds(orgdb, 
-                            keys = fly_genes$gene_id, 
-                            keytype = "FLYBASE", 
-                            column = "SYMBOL", 
+fly_genes$symbol <-  mapIds(orgdb,
+                            keys = fly_genes$gene_id,
+                            keytype = "FLYBASE",
+                            column = "SYMBOL",
                             multiVals = "first")
 ```
 
@@ -261,10 +246,10 @@ fly_genes$symbol <-  mapIds(orgdb,
 ```r
 # GO
 
-favorite_gene_GO <- mapIds(orgdb, 
-                           keys = favorite_gene, 
-                           keytype = "SYMBOL", 
-                           column = "GO", 
+favorite_gene_GO <- mapIds(orgdb,
+                           keys = favorite_gene,
+                           keytype = "SYMBOL",
+                           column = "GO",
                            multiVals = "list")
 ```
 
@@ -545,4 +530,3 @@ fly_rRNA <- fly_gtf[grep("rRNA", fly_gtf$gene_symbol)]
 ##   -------
 ##   seqinfo: 25 sequences from an unspecified genome; no seqlengths
 ```
-
