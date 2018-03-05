@@ -1,0 +1,242 @@
+---
+title: "Granges"
+output: html_document
+---
+
+
+
+## Setup
+
+
+```{r, message=FALSE, warning=FALSE}
+library(GenomicRanges)
+library(GenomicAlignments)
+library(rtracklayer)
+```
+
+```{r, message=FALSE, warning=FALSE}
+
+my_regions <- import.bed("my_regions.bed")
+
+
+```
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+my_regions
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+my_chr <- "chr2L"
+my_regions <- my_regions[seqnames(my_regions) == my_chr]
+```
+
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+my_regions
+```
+
+
+## Coverage
+
+```{r, message=FALSE, warning=FALSE}
+my_bam <- readGAlignments("170816_lane8_10_GTGGCCTT_1.bam")
+my_cov <- coverage(my_bam)
+```
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+my_bam
+my_cov
+```
+
+
+## Counting
+
+```{r, message=FALSE, warning=FALSE}
+my_counts <- countOverlaps(my_regions, subject = my_bam)
+names(my_counts) <- my_regions$name
+```
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+my_counts
+```
+
+## Plotting
+
+This is my plot ...
+
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE, fig.align="center"}
+
+###############
+
+par(mfrow=c(4,1), mar=c(0,0,5,0), cex.main=2, cex.lab=1.75, cex.axis=1.25)
+
+
+my_xrange <- c(min(start(my_regions)), max(end(my_regions)))
+
+
+
+my_sub <- 100
+
+my_ydata <- as.vector(my_cov[[my_chr]])[seq(1, length(my_cov[[my_chr]]), my_sub)]
+
+
+###############
+
+plot(my_xrange/my_sub, main = "Coverage",
+     c(min(my_cov[[my_chr]]), max(my_cov[[my_chr]])),
+     type="n", xlab="", ylab="", yaxt="n", xaxt="n", bty="n")
+
+
+xx <- c(seq_along(my_ydata), rev(my_ydata))
+yy <- c(my_ydata, rev(my_ydata))
+polygon(xx, yy, col = "darkgrey", lwd=0.5)
+
+abline(h=0, lty=1)
+
+###############
+
+par(mar=c(5,0,0,0))
+
+
+plot(c(min(start(my_regions)), max(end(my_regions))), c(0,0), 
+     type="n", xlab=seqnames(my_regions)[1], ylab="", yaxt="n", bty="n")
+
+abline(h=0, lty=2)
+
+text(x = start(my_regions), y = 0.75, adj=0,
+     labels = paste(names(my_counts), my_counts, sep=": "), cex=1.5)
+
+rect(xleft = start(my_regions), 
+     ybottom = ifelse(strand(my_regions) == "+", 0.25, -0.5), 
+     xright = end(my_regions), 
+     ytop = ifelse(strand(my_regions) == "+", 0.5, -0.25),
+       lwd=2, col="black")
+```
+
+
+## Methods
+
+for Granges
+
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE, fig.align="center"}
+
+
+
+###############
+
+
+
+par(mfrow=c(6,1), mar=c(0,0,5,0),  cex.main=2, cex.lab=1.75, cex.axis=1.25)
+
+
+plot(c(min(start(my_regions)), max(end(my_regions))), c(0,0), main = "GRanges Methods",
+     type="n", xlab=seqnames(my_regions)[1], ylab="", yaxt="n", xaxt="n", bty="n")
+
+
+###############
+
+par(mar=c(0,0,0,0))
+
+
+plot(c(min(start(my_regions)), max(end(my_regions))), c(0,0),
+     type="n", xlab=seqnames(my_regions)[1], ylab="", yaxt="n", xaxt="n", bty="n")
+
+abline(v = c(start(my_regions), end(my_regions)), lty=4)
+
+
+rect(xleft = start(my_regions), 
+     ybottom = ifelse(strand(my_regions) == "+", 0, -0.5), 
+     xright = end(my_regions), 
+     ytop = ifelse(strand(my_regions) == "+", 0.5, 0),
+     lwd=2, col="black")
+
+
+
+###############
+
+par(mar=c(0,0,0,0))
+
+my_regions2 <- resize(my_regions, width = 10000, fix = "center")
+
+
+plot(c(min(start(my_regions)), max(end(my_regions))), c(0,0),
+     type="n", xlab=seqnames(my_regions)[1], ylab="", yaxt="n", xaxt="n", bty="n")
+
+abline(v = c(start(my_regions), end(my_regions)), lty=4)
+
+text(x =mean(c(min(start(my_regions)), max(end(my_regions)))), y = 0.75, 
+     labels = "resize", cex=2)
+
+
+rect(xleft = start(my_regions2), 
+     ybottom = ifelse(strand(my_regions2) == "+", 0, -0.5), 
+     xright = end(my_regions2), 
+     ytop = ifelse(strand(my_regions2) == "+", 0.5, 0),
+     lwd=2, col="blue")
+
+
+###############
+
+
+par(mar=c(0,0,0,0))
+
+my_regions2 <- shift(my_regions, shift = 10000)
+
+
+plot(c(min(start(my_regions)), max(end(my_regions))), c(0,0),
+     type="n", xlab=seqnames(my_regions)[1], ylab="", yaxt="n", xaxt="n", bty="n")
+
+abline(v = c(start(my_regions), end(my_regions)), lty=4)
+
+text(x = mean(c(min(start(my_regions)), max(end(my_regions)))), y = 0.75, 
+     labels = "shift", cex=2)
+
+rect(xleft = start(my_regions2), 
+     ybottom = ifelse(strand(my_regions2) == "+", 0, -0.5), 
+     xright = end(my_regions2), 
+     ytop = ifelse(strand(my_regions2) == "+", 0.5, 0),
+     lwd=2, col="darkgreen")
+
+
+###############
+
+
+par(mar=c(0,0,0,0))
+
+my_regions2 <- intersect(my_regions, my_regions2)
+
+
+plot(c(min(start(my_regions)), max(end(my_regions))), c(0,0),
+     type="n", xlab=seqnames(my_regions)[1], ylab="", yaxt="n", xaxt="n", bty="n")
+
+abline(v = c(start(my_regions), end(my_regions)), lty=4)
+
+text(x =mean(c(min(start(my_regions)), max(end(my_regions)))), y = 0.75, 
+     labels = "intersect", cex=2)
+
+rect(xleft = start(my_regions2), 
+     ybottom = ifelse(strand(my_regions2) == "+", 0, -0.5), 
+     xright = end(my_regions2), 
+     ytop = ifelse(strand(my_regions2) == "+", 0.5, 0),
+     lwd=2, col="darkred")
+
+
+
+###############
+
+
+par(mar=c(5,0,0,0))
+
+
+plot(c(min(start(my_regions)), max(end(my_regions))), c(0,0),
+     type="n", xlab=seqnames(my_regions)[1], ylab="", yaxt="n", bty="n")
+
+
+
+
+
+```
+
