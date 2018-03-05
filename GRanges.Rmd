@@ -18,6 +18,7 @@ library(rtracklayer)
 
 my_regions <- import.bed("my_regions.bed")
 
+seqlevelsStyle(my_regions)
 
 ```
 
